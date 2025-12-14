@@ -5,7 +5,32 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Title>BoTech.HttpClientHelper</Title>
+    <Company>www.BoTech.dev</Company>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <FileVersion>1.0.1</FileVersion>
+    <PackageIcon>BoTech-Avatar.png</PackageIcon>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <Description>An http client wrapper (with json encoding), to make http request to api easier</Description>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Version>1.0.1</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\Logos\BoTech-Avatar.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
