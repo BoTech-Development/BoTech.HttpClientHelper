@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="BoTech.HttpClientHelper.Tests/BoTech.HttpClientHelper.Tests.csproj" Id="bd7cb7cb-c754-45e3-b5fa-b9bdea7ea477" />
   <Project Path="BoTech.HttpClientHelper/BoTech.HttpClientHelper.csproj" />
 </Solution>

@@ -1,4 +1,4 @@
-﻿namespace Benteler.WorkPlan.Web.Api
+﻿namespace BoTech.HttpClientHelper
 {
     public class RequestResult<T>(bool success, HttpResponseMessage? message, T? data, Exception? exception)
     {

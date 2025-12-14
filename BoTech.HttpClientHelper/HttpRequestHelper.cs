@@ -1,20 +1,15 @@
-﻿
-
-using BoTech.HttpClientHelper;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace Benteler.WorkPlan.Web.Api
+namespace BoTech.HttpClientHelper
 {
     public class HttpRequestHelper
     {
         /// <summary>
         /// Gets or sets the collection of HTTP request headers associated with the request.
         /// </summary>
-        public HttpRequestHeaders Headers { get; set; }
+        public HttpRequestHeaders? Headers { get; set; } = null;
 
         private string _baseUrl;
         public HttpRequestHelper(string baseUrl)
@@ -72,9 +67,9 @@ namespace Benteler.WorkPlan.Web.Api
         /// </summary>
         /// <param name="url">The endpoint</param>
         /// <returns>The returned string from the api or the </returns>
-        public async Task<RequestResult<string>> HttpGetString(string url)
+        public async Task<RequestResult<string>> HttpGetString(string url, HttpContent? content)
         {
-            RequestResult<dynamic> response = await HttpGet(url, null);
+            RequestResult<dynamic> response = await HttpGet(url, content);
             if (response.IsSuccess())
             {
                 string data = await response.ResponseMessage!.Content.ReadAsStringAsync();
