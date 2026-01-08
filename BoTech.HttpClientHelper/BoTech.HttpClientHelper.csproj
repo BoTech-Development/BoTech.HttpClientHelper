@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Title>BoTech.HttpClientHelper</Title>
@@ -10,11 +9,16 @@
     <AssemblyVersion>1.0.1</AssemblyVersion>
     <FileVersion>1.0.1</FileVersion>
     <PackageIcon>BoTech-Avatar.png</PackageIcon>
-    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Description>An http client wrapper (with json encoding), to make http request to api easier</Description>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.0.1</Version>
+    <Version>1.0.1-Alpha</Version>
+    <PackageProjectUrl>https://github.com/BoTech-Development/BoTech.HttpClientHelper</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/BoTech-Development/BoTech.HttpClientHelper</RepositoryUrl>
+    <PackageTags>Http Client ApiClient</PackageTags>
+    <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
+    <LangVersion>14</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

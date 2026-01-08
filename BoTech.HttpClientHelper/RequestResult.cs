@@ -1,4 +1,7 @@
-﻿namespace BoTech.HttpClientHelper
+﻿using System;
+using System.Net.Http;
+
+namespace BoTech.HttpClientHelper
 {
     public class RequestResult<T>(bool success, HttpResponseMessage? message, T? data, Exception? exception)
     {
