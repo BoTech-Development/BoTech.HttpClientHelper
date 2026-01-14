@@ -20,6 +20,15 @@ namespace BoTech.HttpClientHelper
         {
             _baseUrl = baseUrl;
         }
+        // ----------------------------------------GET----------------------------------------
+        
+        /// <summary>
+        /// Performs a GET request to the given endpoint (baseUrl + url)
+        /// This Method also saves the file to a specific location defined in fileName
+        /// </summary>
+        /// <param name="fileName">The full path of a file to overwrite or create.</param>
+        /// <param name="url">The endpoint url</param>
+        /// <returns>The request result.</returns>
         public async Task<RequestResult<dynamic>> HttpGetFile(string url, string fileName)
         {
             using (HttpClient client = BuildHttpClient())
@@ -46,9 +55,14 @@ namespace BoTech.HttpClientHelper
                 }
             }
         }
+        /// <summary>
+        /// Performs a GET request to the given endpoint (baseUrl + url)
+        /// </summary>
+        /// <param name="url">The endpoint url</param>
+        /// <returns>The request result with parsed json data object</returns>
         public async Task<RequestResult<T>> HttpGetJsonObject<T>(string url)
         {
-            RequestResult<dynamic> response = await HttpGet(url, null);
+            RequestResult<dynamic> response = await HttpGet(url);
             if (response.IsSuccess())
             {
                 string jsonData = await response.ResponseMessage!.Content.ReadAsStringAsync();
@@ -56,24 +70,15 @@ namespace BoTech.HttpClientHelper
             }
             return new RequestResult<T>(false, response.ResponseMessage, default(T), response.Error);
         }
-        public async Task<RequestResult<T>> HttpGetJsonObject<T>(string url, HttpContent? content)
-        {
-            RequestResult<dynamic> response = await HttpGet(url, content);
-            if (response.IsSuccess())
-            {
-                string jsonData = await response.ResponseMessage!.Content.ReadAsStringAsync();
-                return new RequestResult<T>(true, response.ResponseMessage, JsonConvert.DeserializeObject<T>(jsonData), null);
-            }
-            return new RequestResult<T>(false, response.ResponseMessage, default(T), response.Error);
-        }
+    
         /// <summary>
         /// Sends a request to _baseUrl + url and returns the string returned by that method.
         /// </summary>
-        /// <param name="url">The endpoint</param>
-        /// <returns>The returned string from the api or the </returns>
-        public async Task<RequestResult<string>> HttpGetString(string url, HttpContent? content)
+        /// <param name="url">The endpoint url</param>
+        /// <returns>The returned string from the api and the request result.</returns>
+        public async Task<RequestResult<string>> HttpGetString(string url)
         {
-            RequestResult<dynamic> response = await HttpGet(url, content);
+            RequestResult<dynamic> response = await HttpGet(url);
             if (response.IsSuccess())
             {
                 string data = await response.ResponseMessage!.Content.ReadAsStringAsync();
@@ -82,106 +87,193 @@ namespace BoTech.HttpClientHelper
             return new RequestResult<string>(false, response.ResponseMessage, string.Empty, response.Error);
         }
         /// <summary>
-        /// Sends a request to _baseUrl + url and returns the http response.
+        /// Performs a GET request to the given endpoint (baseUrl + url)
         /// </summary>
-        /// <param name="url">The Api url</param>
-        /// <returns>The result of the Get request.</returns>
-        public async Task<RequestResult<dynamic>> HttpGet(string url, HttpContent? content)
+        /// <param name="url">The endpoint url</param>
+        /// <returns>The request result with no parsed json data</returns>
+        public async Task<RequestResult<dynamic>> HttpGet(string url)
         {
-            using (HttpClient client = BuildHttpClient())
-            {
-                HttpResponseMessage? response = null;
-                try
-                {
-                    Console.Write($"Performing GET request: {_baseUrl + url}");
-                    HttpRequestMessage httpRequest = new HttpRequestMessage(HttpMethod.Get, url)
-                    {
-                        Content = content 
-                    };
-                    response = await client.SendAsync(httpRequest);
-
-                    // Ensure the response is successful
-                    response.EnsureSuccessStatusCode();
-
-                    Console.WriteLine($" GET Response Status: {response.StatusCode} ");
-                    return new RequestResult<dynamic>(true, response, null, null);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($" GET Request error: {e.Message}");
-                    return new RequestResult<dynamic>(false, response, null, e);
-                }
-            }
+            return await SendHttpRequest(HttpMethod.Get, url, null);
         }
+        
+        // ----------------------------------------DELETE----------------------------------------
+        
+        /// <summary>
+        /// Performs a DELETE request to the given endpoint (baseUrl + url)
+        /// </summary>
+        /// <param name="url">The endpoint url</param>
+        /// <param name="content">The http content to send</param>
+        /// <returns>The request result with no deserialized data.</returns>
+        public async Task<RequestResult<dynamic>> HttpDelete(string url, HttpContent? content)
+        {
+            return await SendHttpRequest(HttpMethod.Delete, url, content);
+        }
+        /// <summary>
+        /// Performs a DELETE request to the given endpoint (baseUrl + url)
+        /// </summary>
+        /// <param name="url">The endpoint url</param>
+        /// <param name="content">The object which should be serialized to json.</param>
+        /// <returns>The request result with no deserialized data.</returns>
+        public async Task<RequestResult<dynamic>> HttpDeleteJson(string url, object? content)
+        {
+            return await HttpDelete(url, GetJsonHttpContentFromObject(content));
+        }
+        /// <summary>
+        /// Performs a DELETE request to the given endpoint (baseUrl + url)
+        /// </summary>
+        /// <param name="url">The endpoint url</param>
+        /// <param name="content">The object which should be serialized to json.</param>
+        /// <returns>The request result with the deserialized object.</returns>
+        public async Task<RequestResult<T>> HttpDeleteJsonAndGetJson<T>(string url, object? content)
+        {
+            return await HttpDeleteContentAndGetJson<T>(url, GetJsonHttpContentFromObject(content));
+        }
+        /// <summary>
+        /// Performs a DELETE request to the given endpoint (baseUrl + url)
+        /// </summary>
+        /// <param name="url">The endpoint url</param>
+        /// <param name="content">The object which should be serialized to json.</param>
+        /// <returns>The request result with the deserialized object.</returns>
+        public async Task<RequestResult<T>> HttpDeleteContentAndGetJson<T>(string url, HttpContent? content)
+        {
+            return await GetJsonFromRequestResult<T, dynamic>(await HttpDelete(url, content));
+        }
+        
+        // ----------------------------------------PUT----------------------------------------
+        
+        /// <summary>
+        /// Performs a PUT request to the given endpoint (baseUrl + url)
+        /// </summary>
+        /// <param name="url">The endpoint url</param>
+        /// <param name="content">The http content</param>
+        /// <returns>The request result with no deserialized data.</returns>
+        public async Task<RequestResult<dynamic>> HttpPut(string url, HttpContent? content)
+        {
+            return await SendHttpRequest(HttpMethod.Put, url, content);
+        }
+        /// <summary>
+        /// Performs a PUT request to the given endpoint (baseUrl + url)
+        /// </summary>
+        /// <param name="url">The endpoint url</param>
+        /// <param name="content">The object which should be serialized to json.</param>
+        /// <returns>The request result with no deserialized data.</returns>
+        public async Task<RequestResult<dynamic>> HttpPutJson(string url, object? content)
+        {
+            return await HttpPut(url, GetJsonHttpContentFromObject(content));
+        }
+        /// <summary>
+        /// Performs a PUT request to the given endpoint (baseUrl + url)
+        /// </summary>
+        /// <param name="url">The endpoint url</param>
+        /// <param name="content">The object which should be serialized to json.</param>
+        /// <returns>The request result with the deserialized object.</returns>
+        public async Task<RequestResult<T>> HttpPutJsonAndGetJson<T>(string url, object? content)
+        {
+            return await HttpPutContentAndGetJson<T>(url, GetJsonHttpContentFromObject(content));
+        }
+        /// <summary>
+        /// Performs a PUT request to the given endpoint (baseUrl + url)
+        /// </summary>
+        /// <param name="url">The endpoint url</param>
+        /// <param name="content">The object which should be serialized to json.</param>
+        /// <returns>The request result with the deserialized object.</returns>
+        public async Task<RequestResult<T>> HttpPutContentAndGetJson<T>(string url, HttpContent? content)
+        {
+            return await GetJsonFromRequestResult<T, dynamic>(await HttpPut(url, content));
+        }
+        
+        // ----------------------------------------PATCH----------------------------------------
+        
+        /// <summary>
+        /// Performs a PATCH request to the given endpoint (baseUrl + url)
+        /// </summary>
+        /// <param name="url">The endpoint url</param>
+        /// <param name="content">The http content</param>
+        /// <returns>The request result with no deserialized data.</returns>
         public async Task<RequestResult<dynamic>> HttpPatch(string url, HttpContent? content)
         {
-            using (HttpClient client = BuildHttpClient())
-            {
-                HttpResponseMessage? response = null;
-                try
-                {
-                    Console.Write($"Performing Patch request: {_baseUrl + url}");
-                    response = await client.PatchAsync(url, content);
-
-                    // Ensure the response is successful
-                    response.EnsureSuccessStatusCode();
-
-                    Console.WriteLine($" Patch Response Status: {response.StatusCode} ");
-                    return new RequestResult<dynamic>(true, response, null, null);
-                }
-                catch (HttpRequestException e)
-                {
-                    Console.WriteLine($" Patch Request error: {e.Message}");
-                    return new RequestResult<dynamic>(false, response, null, e);
-                }
-            }
+            return await SendHttpRequest(HttpMethod.Patch, url, content);
         }
+        /// <summary>
+        /// Performs a PATCH request to the given endpoint (baseUrl + url)
+        /// </summary>
+        /// <param name="url">The endpoint url</param>
+        /// <param name="content">The object which should be serialized to json.</param>
+        /// <returns>The request result with no deserialized data.</returns>
+        public async Task<RequestResult<dynamic>> HttpPatchJson(string url, object? content)
+        {
+            return await HttpPatch(url, GetJsonHttpContentFromObject(content));
+        }
+        /// <summary>
+        /// Performs a PATCH request to the given endpoint (baseUrl + url)
+        /// </summary>
+        /// <param name="url">The endpoint url</param>
+        /// <param name="content">The object which should be serialized to json.</param>
+        /// <returns>The request result with the deserialized object.</returns>
+        public async Task<RequestResult<T>> HttpPatchJsonAndGetJson<T>(string url, object? content)
+        {
+            return await HttpPatchContentAndGetJson<T>(url, GetJsonHttpContentFromObject(content));
+        }
+        /// <summary>
+        /// Performs a PATCH request to the given endpoint (baseUrl + url)
+        /// </summary>
+        /// <param name="url">The endpoint url</param>
+        /// <param name="content">The object which should be serialized to json.</param>
+        /// <returns>The request result with the deserialized object.</returns>
+        public async Task<RequestResult<T>> HttpPatchContentAndGetJson<T>(string url, HttpContent content)
+        {
+            return await GetJsonFromRequestResult<T, dynamic>(await HttpPatch(url, content));
+        }
+        
+        // ----------------------------------------POST----------------------------------------
+        
+        /// <summary>
+        /// Performs a POST request to the given endpoint (baseUrl + url)
+        /// </summary>
+        /// <param name="url">The endpoint url</param>
+        /// <param name="content">The http content</param>
+        /// <returns>The request result with no deserialized data.</returns>
         public async Task<RequestResult<dynamic>> HttpPost(string url, HttpContent content)
         {
-            using (HttpClient client = BuildHttpClient())
-            {
-                HttpResponseMessage? response = null;
-                try
-                {
-                    Console.Write($"Performing Post request: {_baseUrl + url}");
-                    response = await client.PostAsync(url, content);
-                    
-
-                    // Ensure the response is successful
-                    response.EnsureSuccessStatusCode();
-
-                    Console.WriteLine($" Patch Response Status: {response.StatusCode} ");
-
-                    return new RequestResult<dynamic>(true, response, null, null);
-                }
-                catch (HttpRequestException e)
-                {
-                    Console.WriteLine($" Patch Request error: {e.Message}");
-                    return new RequestResult<dynamic>(false, response, null, e);
-                }
-            }
+            return await SendHttpRequest(HttpMethod.Post, url, content);
         }
+        /// <summary>
+        /// Performs a POST request to the given endpoint (baseUrl + url)
+        /// </summary>
+        /// <param name="url">The endpoint url</param>
+        /// <param name="content">The object which should be serialized to json.</param>
+        /// <returns>The request result with no deserialized data.</returns>
         public async Task<RequestResult<dynamic>> HttpPostJson(string url, object? content)
         {
-            if(content != null)
-                return await HttpPost(url, new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json"));
-            else 
-                return await HttpPost(url, new StringContent(string.Empty));
+            return await HttpPost(url, GetJsonHttpContentFromObject(content));
+        }
+        /// <summary>
+        /// Performs a POST request to the given endpoint (baseUrl + url)
+        /// </summary>
+        /// <param name="url">The endpoint url</param>
+        /// <param name="content">The object which should be serialized to json.</param>
+        /// <returns>The request result with the deserialized object.</returns>
+        public async Task<RequestResult<T>> HttpPostJsonAndGetJson<T>(string url, object? content)
+        {
+            return await HttpPostContentAndGetJson<T>(url, GetJsonHttpContentFromObject(content));
+        }
+        /// <summary>
+        /// Performs a POST request to the given endpoint (baseUrl + url)
+        /// </summary>
+        /// <param name="url">The endpoint url</param>
+        /// <param name="content">The object which should be serialized to json.</param>
+        /// <returns>The request result with the deserialized object.</returns>
+        public async Task<RequestResult<T>> HttpPostContentAndGetJson<T>(string url, HttpContent content)
+        {
+            return await GetJsonFromRequestResult<T, dynamic>(await HttpPost(url, content));
         }
 
-        public async Task<RequestResult<T>> HttpPostJsonAndGetJson<T>(string url, object? content)
+        private async Task<RequestResult<T>> GetJsonFromRequestResult<T, U>(RequestResult<U> result)
         {
             try
             {
-                RequestResult<dynamic> result = await HttpPostJson(url, content);
-                if (result.IsSuccess())
-                {
-                    string jsonData = await result.ResponseMessage!.Content.ReadAsStringAsync();
-                    if (jsonData.Length > 0)
-                        return new RequestResult<T>(true, result.ResponseMessage,
-                            JsonConvert.DeserializeObject<T>(jsonData), null);
-                }
-
+                if (result.IsSuccess() &&  result.ResponseMessage != null)
+                    return new RequestResult<T>(true, result.ResponseMessage, await GetJsonObjectFromHttpResponseMessage<T>(result.ResponseMessage), null);
                 return new RequestResult<T>(false, result.ResponseMessage, default(T), result.Error);
             }
             catch (Exception e)
@@ -190,17 +282,47 @@ namespace BoTech.HttpClientHelper
             }
         }
 
-        public async Task<RequestResult<T>> HttpPostGetJson<T>(string url)
+        private async Task<RequestResult<dynamic>> SendHttpRequest(HttpMethod method, string url, HttpContent? content)
         {
-            return await HttpPostJsonAndGetJson<T>(url, null);
+            using (HttpClient client = BuildHttpClient())
+            {
+                HttpResponseMessage? response = null;
+                try
+                {
+                    Console.Write($"─> 🔄️ Performing {method.Method} request: {_baseUrl + url}");
+                    response = await client.SendAsync(new HttpRequestMessage(method, url){Content = content});
+                    
+
+                    // Ensure the response is successful
+                    response.EnsureSuccessStatusCode();
+
+                    Console.WriteLine($"└─> ✅ {method.Method} Response Status: {response.StatusCode} ");
+
+                    return new RequestResult<dynamic>(true, response, null, null);
+                }
+                catch (HttpRequestException e)
+                {
+                    Console.WriteLine($"└─> ❌ Patch Request error: {e.Message}");
+                    return new RequestResult<dynamic>(false, response, null, e);
+                }
+            }
+        }
+        private StringContent GetJsonHttpContentFromObject(object? objectToSerialize) => new StringContent(JsonConvert.SerializeObject(objectToSerialize), Encoding.UTF8, "application/json");
+        
+        private async Task<T?> GetJsonObjectFromHttpResponseMessage<T>(HttpResponseMessage response)
+        {
+            string jsonData = await response.Content.ReadAsStringAsync();
+            if (jsonData.Length > 0)
+                return JsonConvert.DeserializeObject<T>(jsonData);
+            return default(T);
         }
         private HttpClient BuildHttpClient()
         {
-            HttpClientBuilder builder = new HttpClientBuilder(_baseUrl);
+            HttpClientBuilder builder; 
             if (Headers != null)
-            {
                 builder = new HttpClientBuilder(_baseUrl, Headers);
-            }
+            else
+                builder = new HttpClientBuilder(_baseUrl);
             return builder.Build();
         }
     }

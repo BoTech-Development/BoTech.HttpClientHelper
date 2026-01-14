@@ -6,19 +6,20 @@
     <Title>BoTech.HttpClientHelper</Title>
     <Company>www.BoTech.dev</Company>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <AssemblyVersion>1.0.1</AssemblyVersion>
-    <FileVersion>1.0.1</FileVersion>
+    <AssemblyVersion>1.0.2</AssemblyVersion>
+    <FileVersion>1.0.2</FileVersion>
     <PackageIcon>BoTech-Avatar.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Description>An http client wrapper (with json encoding), to make http request to api easier</Description>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.0.1-Alpha</Version>
-    <PackageProjectUrl>https://github.com/BoTech-Development/BoTech.HttpClientHelper</PackageProjectUrl>
+    <Version>1.0.2-Alpha</Version>
+    <PackageProjectUrl>https://docs.botech.dev/botech-httpclienthelper/v1-1/about/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/BoTech-Development/BoTech.HttpClientHelper</RepositoryUrl>
     <PackageTags>Http Client ApiClient</PackageTags>
     <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
     <LangVersion>14</LangVersion>
+    <PackageReleaseNotes>Added more http-methods. See #1 on github.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
