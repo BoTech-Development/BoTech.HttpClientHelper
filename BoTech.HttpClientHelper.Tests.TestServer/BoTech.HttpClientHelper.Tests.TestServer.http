@@ -1,0 +1,6 @@
+@BoTech.HttpClientHelper.Tests.TestServer_HostAddress = http://localhost:5182
+
+GET {{BoTech.HttpClientHelper.Tests.TestServer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

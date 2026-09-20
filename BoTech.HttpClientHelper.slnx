@@ -1,4 +1,5 @@
 <Solution>
-  <Project Path="BoTech.HttpClientHelper.Tests/BoTech.HttpClientHelper.Tests.csproj" Id="bd7cb7cb-c754-45e3-b5fa-b9bdea7ea477" />
+  <Project Path="BoTech.HttpClientHelper.Tests.TestServer/BoTech.HttpClientHelper.Tests.TestServer.csproj" Id="0d415705-21cd-4389-b1dd-c0326c9bf888" />
+  <Project Path="BoTech.HttpClientHelper.Tests/BoTech.HttpClientHelper.Tests.csproj" Id="beb5c3a6-9ea9-496c-a0f0-bce1aa23e9c0" />
   <Project Path="BoTech.HttpClientHelper/BoTech.HttpClientHelper.csproj" />
 </Solution>

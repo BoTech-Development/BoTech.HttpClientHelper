@@ -29,29 +29,57 @@ namespace BoTech.HttpClientHelper
         /// <param name="fileName">The full path of a file to overwrite or create.</param>
         /// <param name="url">The endpoint url</param>
         /// <returns>The request result.</returns>
-        public async Task<RequestResult<dynamic>> HttpGetFile(string url, string fileName)
+        public async Task<RequestResult<dynamic>> HttpGetFileAndCopyTo(string url, string fileName)
+        {
+            RequestResult<Stream> innerResult = await HttpGetFileStream(url);
+            if(!innerResult.IsSuccess())
+                return RequestResult<dynamic>.ErrorFactory(innerResult.ResponseMessage, innerResult.Error);
+            
+            Console.Write($"──> 🔄️  Writing download result to: {fileName}");
+            Stream stream = innerResult.ParsedData!;
+            using (FileStream fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write)) 
+            {
+                stream.CopyTo(fileStream);
+            }
+            Console.WriteLine($" └─> ✅ Downloaded File written to: {fileName}");
+            return RequestResult<dynamic>.SuccessFactory(innerResult.ResponseMessage);
+        }
+        /// <summary>
+        /// Performs a GET request to the given endpoint (baseUrl + url).
+        /// This Method downloads the file and returns the contents as a string.
+        /// </summary>
+        /// <param name="url">The endpoint Url</param>
+        /// <returns>The request result including the read contents as string.</returns>
+        public async Task<RequestResult<string>> HttpGetFileContents(string url)
+        {
+            RequestResult<Stream> innerResult = await HttpGetFileStream(url);
+            if (innerResult.IsSuccess())
+            {
+                string fileContents = await new StreamReader(innerResult.ParsedData).ReadToEndAsync();
+                return RequestResult<string>.SuccessFactory(innerResult.ResponseMessage, fileContents);
+            }
+            return RequestResult<string>.ErrorFactory(innerResult.ResponseMessage, innerResult.Error);
+        }
+        private async Task<RequestResult<Stream>> HttpGetFileStream(string url)
         {
             using (HttpClient client = BuildHttpClient())
             {
                 HttpResponseMessage? response = null;
                 try
                 {
+                    Console.WriteLine($"─> 🔄️ Performing File-Get request: {_baseUrl + url}");
+                    
                     response = await client.GetAsync(url);
-
                     response.EnsureSuccessStatusCode();
 
-                    using (Stream stream = await response.Content.ReadAsStreamAsync())
-                    using (FileStream fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
-                    {
-                        stream.CopyTo(fileStream);
-                    }
-
-                    Console.WriteLine($"File downloaded to: {fileName}");
-                    return new RequestResult<dynamic>(true, response, fileName, null);
+                    Stream stream = await response.Content.ReadAsStreamAsync();
+                    Console.WriteLine($"└─> ✅ Downloaded with Response Status: {response.StatusCode} ");
+                    return RequestResult<Stream>.SuccessFactory(response, stream);
                 }
                 catch (Exception e)
                 {
-                    return new RequestResult<dynamic>(false, response, null, e);
+                    Console.WriteLine($"└─> ❌ File-Get Request error: {e.Message}");
+                    return RequestResult<Stream>.ErrorFactory(response, e);
                 }
             }
         }
@@ -66,9 +94,9 @@ namespace BoTech.HttpClientHelper
             if (response.IsSuccess())
             {
                 string jsonData = await response.ResponseMessage!.Content.ReadAsStringAsync();
-                return new RequestResult<T>(true, response.ResponseMessage, JsonConvert.DeserializeObject<T>(jsonData), null);
+                return RequestResult<T>.SuccessFactory(response.ResponseMessage, JsonConvert.DeserializeObject<T>(jsonData));
             }
-            return new RequestResult<T>(false, response.ResponseMessage, default(T), response.Error);
+            return RequestResult<T>.ErrorFactory(response.ResponseMessage, response.Error);
         }
     
         /// <summary>
@@ -82,9 +110,9 @@ namespace BoTech.HttpClientHelper
             if (response.IsSuccess())
             {
                 string data = await response.ResponseMessage!.Content.ReadAsStringAsync();
-                return new RequestResult<string>(true, response.ResponseMessage, data, null);
+                return RequestResult<string>.SuccessFactory(response.ResponseMessage, data);
             }
-            return new RequestResult<string>(false, response.ResponseMessage, string.Empty, response.Error);
+            return RequestResult<string>.ErrorFactory(response.ResponseMessage, response.Error);
         }
         /// <summary>
         /// Performs a GET request to the given endpoint (baseUrl + url)
@@ -273,12 +301,12 @@ namespace BoTech.HttpClientHelper
             try
             {
                 if (result.IsSuccess() &&  result.ResponseMessage != null)
-                    return new RequestResult<T>(true, result.ResponseMessage, await GetJsonObjectFromHttpResponseMessage<T>(result.ResponseMessage), null);
-                return new RequestResult<T>(false, result.ResponseMessage, default(T), result.Error);
+                    return RequestResult<T>.SuccessFactory(result.ResponseMessage, await GetJsonObjectFromHttpResponseMessage<T>(result.ResponseMessage));
+                return RequestResult<T>.ErrorFactory(result.ResponseMessage, result.Error);
             }
             catch (Exception e)
             {
-                return new RequestResult<T>(false, null, default(T), e);
+                return RequestResult<T>.ErrorFactory(result.ResponseMessage, e);
             }
         }
 
@@ -289,7 +317,7 @@ namespace BoTech.HttpClientHelper
                 HttpResponseMessage? response = null;
                 try
                 {
-                    Console.Write($"─> 🔄️ Performing {method.Method} request: {_baseUrl + url}");
+                    Console.WriteLine($"─> 🔄️ Performing {method.Method} request: {_baseUrl + url}");
                     response = await client.SendAsync(new HttpRequestMessage(method, url){Content = content});
                     
 
@@ -298,12 +326,12 @@ namespace BoTech.HttpClientHelper
 
                     Console.WriteLine($"└─> ✅ {method.Method} Response Status: {response.StatusCode} ");
 
-                    return new RequestResult<dynamic>(true, response, null, null);
+                    return RequestResult<dynamic>.SuccessFactory(response);
                 }
                 catch (HttpRequestException e)
                 {
-                    Console.WriteLine($"└─> ❌ Patch Request error: {e.Message}");
-                    return new RequestResult<dynamic>(false, response, null, e);
+                    Console.WriteLine($"└─> ❌ {method.Method} Request error: {e.Message}");
+                    return RequestResult<dynamic>.ErrorFactory(response, e);
                 }
             }
         }
