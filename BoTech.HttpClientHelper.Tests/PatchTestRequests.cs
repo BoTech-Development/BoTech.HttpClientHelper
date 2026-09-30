@@ -1,4 +1,6 @@
-﻿namespace BoTech.HttpClientHelper.Tests;
+﻿using BoTech.HttpClientHelper.Models;
+
+namespace BoTech.HttpClientHelper.Tests;
 
 [TestClass]
 public class PatchTestRequests
@@ -29,7 +31,7 @@ public class PatchTestRequests
     [TestMethod]
     public void TestPatchPatchJsonAndGetJson()
     {
-        RequestResult<TestDto> result = _httpHelper.HttpPatchJsonAndGetJson<TestDto>("/api/Test/PatchJsonAndGetJson", _standardJsonRequest).Result;
+        RequestResult result = _httpHelper.HttpPatchJsonAndGetJson("/api/Test/PatchJsonAndGetJson", _standardJsonRequest, JsonDtoSelectionOptions.CreateForSingleStatusOkDtoType(typeof(TestDto))).Result;
         if(!result.IsSuccess())
             Assert.Fail(result.Error.Message);  
         if(!result.ParsedData.Equals(_standardJsonReturn))
@@ -38,7 +40,7 @@ public class PatchTestRequests
     [TestMethod]
     public void TestPatchHttpContentAndGetJson()
     {
-        RequestResult<TestDto> result = _httpHelper.HttpPatchContentAndGetJson<TestDto>("/api/Test/PatchHttpContentAndGetJson", new StringContent("FloBo")).Result; // inserts into the Name property of the TestDto
+        RequestResult result = _httpHelper.HttpPatchContentAndGetJson("/api/Test/PatchHttpContentAndGetJson", new StringContent("FloBo"), JsonDtoSelectionOptions.CreateForSingleStatusOkDtoType(typeof(TestDto))).Result; // inserts into the Name property of the TestDto
         if(!result.IsSuccess())
             Assert.Fail(result.Error.Message);  
         if(!result.ParsedData.Equals(_standardJsonReturn))
@@ -48,7 +50,7 @@ public class PatchTestRequests
     [TestMethod]
     public void TestPatchJson()
     {
-        RequestResult<dynamic> result = _httpHelper.HttpPatchJson("/api/Test/PatchJson", _standardJsonRequest).Result; // inserts into the Name property of the TestDto
+        RequestResult result = _httpHelper.HttpPatchJson("/api/Test/PatchJson", _standardJsonRequest).Result; // inserts into the Name property of the TestDto
         if(!result.IsSuccess())
             Assert.Fail(result.Error.Message);  
     }
@@ -56,7 +58,7 @@ public class PatchTestRequests
     [TestMethod]
     public void TestPatch()
     {
-        RequestResult<dynamic> result = _httpHelper.HttpPatch("/api/Test/Patch", new StringContent("")).Result; // inserts into the Name property of the TestDto
+        RequestResult result = _httpHelper.HttpPatch("/api/Test/Patch", new StringContent("")).Result; // inserts into the Name property of the TestDto
         if(!result.IsSuccess())
             Assert.Fail(result.Error.Message);  
     }

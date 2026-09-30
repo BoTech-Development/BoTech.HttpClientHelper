@@ -1,4 +1,6 @@
-﻿namespace BoTech.HttpClientHelper.Tests;
+﻿using BoTech.HttpClientHelper.Models;
+
+namespace BoTech.HttpClientHelper.Tests;
 
 [TestClass]
 public class DeleteTestRequests
@@ -29,7 +31,7 @@ public class DeleteTestRequests
     [TestMethod]
     public void TestDeleteJsonAndGetJson()
     {
-        RequestResult<TestDto> result = _httpHelper.HttpDeleteJsonAndGetJson<TestDto>("/api/Test/DeleteJsonAndGetJson", _standardJsonRequest).Result;
+        RequestResult result = _httpHelper.HttpDeleteJsonAndGetJson("/api/Test/DeleteJsonAndGetJson", _standardJsonRequest, JsonDtoSelectionOptions.CreateForSingleStatusOkDtoType(typeof(TestDto))).Result;
         if(!result.IsSuccess())
             Assert.Fail(result.Error.Message);  
         if(!result.ParsedData.Equals(_standardJsonReturn))
@@ -38,7 +40,7 @@ public class DeleteTestRequests
     [TestMethod]
     public void TestDeleteHttpContentAndGetJson()
     {
-        RequestResult<TestDto> result = _httpHelper.HttpDeleteContentAndGetJson<TestDto>("/api/Test/DeleteHttpContentAndGetJson", new StringContent("FloBo")).Result; // inserts into the Name property of the TestDto
+        RequestResult result = _httpHelper.HttpDeleteContentAndGetJson("/api/Test/DeleteHttpContentAndGetJson", new StringContent("FloBo"), JsonDtoSelectionOptions.CreateForSingleStatusOkDtoType(typeof(TestDto))).Result; // inserts into the Name property of the TestDto
         if(!result.IsSuccess())
             Assert.Fail(result.Error.Message);  
         if(!result.ParsedData.Equals(_standardJsonReturn))
@@ -48,7 +50,7 @@ public class DeleteTestRequests
     [TestMethod]
     public void TestDeleteJson()
     {
-        RequestResult<dynamic> result = _httpHelper.HttpDeleteJson("/api/Test/DeleteJson", _standardJsonRequest).Result; // inserts into the Name property of the TestDto
+        RequestResult result = _httpHelper.HttpDeleteJson("/api/Test/DeleteJson", _standardJsonRequest).Result; // inserts into the Name property of the TestDto
         if(!result.IsSuccess())
             Assert.Fail(result.Error.Message);  
     }
@@ -56,7 +58,7 @@ public class DeleteTestRequests
     [TestMethod]
     public void TestDelete()
     {
-        RequestResult<dynamic> result = _httpHelper.HttpDelete("/api/Test/Delete", new StringContent("")).Result; // inserts into the Name property of the TestDto
+        RequestResult result = _httpHelper.HttpDelete("/api/Test/Delete", new StringContent("")).Result; // inserts into the Name property of the TestDto
         if(!result.IsSuccess())
             Assert.Fail(result.Error.Message);  
     }

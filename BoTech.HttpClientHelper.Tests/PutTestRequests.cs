@@ -1,4 +1,6 @@
-﻿namespace BoTech.HttpClientHelper.Tests;
+﻿using BoTech.HttpClientHelper.Models;
+
+namespace BoTech.HttpClientHelper.Tests;
 
 [TestClass]
 public class PutTestRequests
@@ -29,7 +31,7 @@ public class PutTestRequests
     [TestMethod]
     public void TestPutJsonAndGetJson()
     {
-        RequestResult<TestDto> result = _httpHelper.HttpPutJsonAndGetJson<TestDto>("/api/Test/PutJsonAndGetJson", _standardJsonRequest).Result;
+        RequestResult result = _httpHelper.HttpPutJsonAndGetJson("/api/Test/PutJsonAndGetJson", _standardJsonRequest, JsonDtoSelectionOptions.CreateForSingleStatusOkDtoType(typeof(TestDto))).Result;
         if(!result.IsSuccess())
             Assert.Fail(result.Error.Message);  
         if(!result.ParsedData.Equals(_standardJsonReturn))
@@ -38,7 +40,7 @@ public class PutTestRequests
     [TestMethod]
     public void TestPutHttpContentAndGetJson()
     {
-        RequestResult<TestDto> result = _httpHelper.HttpPutContentAndGetJson<TestDto>("/api/Test/PutHttpContentAndGetJson", new StringContent("FloBo")).Result; // inserts into the Name property of the TestDto
+        RequestResult result = _httpHelper.HttpPutContentAndGetJson("/api/Test/PutHttpContentAndGetJson", new StringContent("FloBo"), JsonDtoSelectionOptions.CreateForSingleStatusOkDtoType(typeof(TestDto))).Result; // inserts into the Name property of the TestDto
         if(!result.IsSuccess())
             Assert.Fail(result.Error.Message);  
         if(!result.ParsedData.Equals(_standardJsonReturn))
@@ -48,7 +50,7 @@ public class PutTestRequests
     [TestMethod]
     public void TestPutJson()
     {
-        RequestResult<dynamic> result = _httpHelper.HttpPutJson("/api/Test/PutJson", _standardJsonRequest).Result; // inserts into the Name property of the TestDto
+        RequestResult result = _httpHelper.HttpPutJson("/api/Test/PutJson", _standardJsonRequest).Result; // inserts into the Name property of the TestDto
         if(!result.IsSuccess())
             Assert.Fail(result.Error.Message);  
     }
@@ -56,7 +58,7 @@ public class PutTestRequests
     [TestMethod]
     public void TestPut()
     {
-        RequestResult<dynamic> result = _httpHelper.HttpPut("/api/Test/Put", new StringContent("")).Result; // inserts into the Name property of the TestDto
+        RequestResult result = _httpHelper.HttpPut("/api/Test/Put", new StringContent("")).Result; // inserts into the Name property of the TestDto
         if(!result.IsSuccess())
             Assert.Fail(result.Error.Message);  
     }

@@ -3,13 +3,13 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
-namespace BoTech.HttpClientHelper
+namespace BoTech.HttpClientHelper.Services
 {
     /// <summary>
     /// This class is only neccessary because HttpClient does not provide a setter for the DefaultRequestHeaders property.
     /// ( ˘︹˘ )(ㆆ_ㆆ)
     /// </summary>
-    public class HttpClientBuilder
+    internal class HttpClientBuilder
     {   
         private string _baseUrl;
         private HttpMessageHandler _httpMessageHandler;

@@ -1,4 +1,6 @@
-﻿namespace BoTech.HttpClientHelper.Tests
+﻿using BoTech.HttpClientHelper.Models;
+
+namespace BoTech.HttpClientHelper.Tests
 {
     [TestClass]
     public sealed class GetTestRequests
@@ -22,23 +24,23 @@
         [TestMethod]
         public void TestGetAndStoreFile()
         {
-            RequestResult<dynamic> result =_httpHelper.HttpGetFileAndCopyTo("TestFile.txt", "someFile.txt").Result;
+            RequestResult result =_httpHelper.HttpGetFileAndCopyTo("TestFile.txt", "someFile.txt").Result;
             if(!result.IsSuccess())
                 Assert.Fail(result.Error.Message);  
         }
         [TestMethod]
         public void TestGetContentsOfFile()
         {
-            RequestResult<string> result =_httpHelper.HttpGetFileContents("TestFile.txt").Result;
+            RequestResult result =_httpHelper.HttpGetFileContents("TestFile.txt").Result;
             if(!result.IsSuccess())
                 Assert.Fail(result.Error.Message);
-            if (result.ParsedData != "This is a test file.") 
+            if (result.ParsedData!.ToString()!.Equals("This is a test file.") == false) 
                 Assert.Fail("File contents do not match");
         }
         [TestMethod]
         public void TestGetJson()
         {
-            RequestResult<TestDto> result =_httpHelper.HttpGetJsonObject<TestDto>("/api/Test/GetJson").Result;
+            RequestResult result =_httpHelper.HttpGetJsonObject("/api/Test/GetJson", JsonDtoSelectionOptions.CreateForSingleStatusOkDtoType(typeof(TestDto))).Result;
             if(!result.IsSuccess())
                 Assert.Fail(result.Error.Message);
             if(!result.ParsedData.Equals(_standardJsonReturn))
@@ -47,10 +49,10 @@
         [TestMethod]
         public void TestGetString()
         {
-            RequestResult<string> result =_httpHelper.HttpGetString("/api/Test/GetString").Result;
+            RequestResult result =_httpHelper.HttpGetString("/api/Test/GetString").Result;
             if(!result.IsSuccess())
                 Assert.Fail(result.Error.Message);
-            if(result.ParsedData != "This is a test string")
+            if(result.ParsedData!.ToString()!.Equals("This is a test string") == false)
                 Assert.Fail("String data does not match");
         }
     }
