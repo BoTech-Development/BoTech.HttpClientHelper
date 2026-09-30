@@ -14,7 +14,7 @@ namespace BoTech.HttpClientHelper.Tests.TestServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("[action]")]
-        public IActionResult GetJson()
+        public ActionResult<TestDto> GetJson()
         {
             return Ok(new TestDto()
             {
@@ -26,7 +26,7 @@ namespace BoTech.HttpClientHelper.Tests.TestServer.Controllers
 
         // GET: api/test/string
         [HttpGet("[action]")]
-        public IActionResult GetString()
+        public ContentResult GetString()
         {
             return Content("This is a test string", "text/plain");
         }
@@ -35,7 +35,7 @@ namespace BoTech.HttpClientHelper.Tests.TestServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("[action]")]
-        public IActionResult GetFile()
+        public FileContentResult GetFile()
         {
             var bytes = Encoding.UTF8.GetBytes("This is a test file content.");
             return File(bytes, "application/octet-stream", "testfile.txt");
@@ -47,13 +47,13 @@ namespace BoTech.HttpClientHelper.Tests.TestServer.Controllers
         /// <param name="data"></param>
         /// <returns></returns>
         [HttpPost("[action]")]
-        public IActionResult PostJsonAndGetJson([FromBody] TestDto data)
+        public ActionResult<TestDto> PostJsonAndGetJson([FromBody] TestDto data)
         {
             data.Name = "FloBo";
             return Ok(data);
         }
         [HttpPost("[action]")]
-        public async Task<IActionResult> PostHttpContentAndGetJson()
+        public async Task<ActionResult<TestDto>> PostHttpContentAndGetJson()
         {
             using var reader = new StreamReader(Request.Body);
             string data = await reader.ReadToEndAsync();
@@ -66,27 +66,30 @@ namespace BoTech.HttpClientHelper.Tests.TestServer.Controllers
             });
         }
         [HttpPost("[action]")]
-        public IActionResult PostJson([FromBody] TestDto data)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult PostJson([FromBody] TestDto data)
         {
             if(data.Name == "Florian")
                 return Ok();
             return BadRequest();
         }
         [HttpPost("[action]")]
-        public IActionResult Post()
+        public ActionResult Post()
         {
             return Ok();
         }
         
         
         [HttpPut("[action]")]
-        public IActionResult PutJsonAndGetJson([FromBody] TestDto data)
+        public ActionResult<TestDto> PutJsonAndGetJson([FromBody] TestDto data)
         {
             data.Name = "FloBo";
             return Ok(data);
         }
         [HttpPut("[action]")]
-        public async Task<IActionResult> PutHttpContentAndGetJson()
+        [ProducesResponseType(typeof(TestDto), StatusCodes.Status200OK)]
+        public async Task<ActionResult<TestDto>> PutHttpContentAndGetJson()
         {
             using var reader = new StreamReader(Request.Body);
             string data = await reader.ReadToEndAsync();
@@ -99,27 +102,29 @@ namespace BoTech.HttpClientHelper.Tests.TestServer.Controllers
             });
         }
         [HttpPut("[action]")]
-        public IActionResult PutJson([FromBody] TestDto data)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult PutJson([FromBody] TestDto data)
         {
             if(data.Name == "Florian")
                 return Ok();
             return BadRequest();
         }
         [HttpPut("[action]")]
-        public IActionResult Put()
+        public ActionResult Put()
         {
             return Ok();
         }
         
         
         [HttpPatch("[action]")]
-        public IActionResult PatchJsonAndGetJson([FromBody] TestDto data)
+        public ActionResult<TestDto> PatchJsonAndGetJson([FromBody] TestDto data)
         {
             data.Name = "FloBo";
             return Ok(data);
         }
         [HttpPatch("[action]")]
-        public async Task<IActionResult> PatchHttpContentAndGetJson()
+        public async Task<ActionResult<TestDto>> PatchHttpContentAndGetJson()
         {
             using var reader = new StreamReader(Request.Body);
             string data = await reader.ReadToEndAsync();
@@ -132,27 +137,29 @@ namespace BoTech.HttpClientHelper.Tests.TestServer.Controllers
             });
         }
         [HttpPatch("[action]")]
-        public IActionResult PatchJson([FromBody] TestDto data)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult PatchJson([FromBody] TestDto data)
         {
             if(data.Name == "Florian")
                 return Ok();
             return BadRequest();
         }
         [HttpPatch("[action]")]
-        public IActionResult Patch()
+        public ActionResult Patch()
         {
             return Ok();
         }
         
 
         [HttpDelete("[action]")]
-        public IActionResult DeleteJsonAndGetJson([FromBody] TestDto data)
+        public ActionResult<TestDto> DeleteJsonAndGetJson([FromBody] TestDto data)
         {
             data.Name = "FloBo";
             return Ok(data);
         }
         [HttpDelete("[action]")]
-        public async Task<IActionResult> DeleteHttpContentAndGetJson()
+        public async Task<ActionResult<TestDto>> DeleteHttpContentAndGetJson()
         {
             using var reader = new StreamReader(Request.Body);
             string data = await reader.ReadToEndAsync();
@@ -165,14 +172,16 @@ namespace BoTech.HttpClientHelper.Tests.TestServer.Controllers
             });
         }
         [HttpDelete("[action]")]
-        public IActionResult DeleteJson([FromBody] TestDto data)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult DeleteJson([FromBody] TestDto data)
         {
             if(data.Name == "Florian")
                 return Ok();
             return BadRequest();
         }
         [HttpDelete("[action]")]
-        public IActionResult Delete()
+        public ActionResult Delete()
         {
             return Ok();
         }

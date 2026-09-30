@@ -1,10 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Net.Http;
-using Newtonsoft.Json;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace BoTech.HttpClientHelper
 {
@@ -94,7 +90,7 @@ namespace BoTech.HttpClientHelper
             if (response.IsSuccess())
             {
                 string jsonData = await response.ResponseMessage!.Content.ReadAsStringAsync();
-                return RequestResult<T>.SuccessFactory(response.ResponseMessage, JsonConvert.DeserializeObject<T>(jsonData));
+                return RequestResult<T>.SuccessFactory(response.ResponseMessage, JsonSerializer.Deserialize<T>(jsonData, JsonSerializerOptions.Web));
             }
             return RequestResult<T>.ErrorFactory(response.ResponseMessage, response.Error);
         }
@@ -335,13 +331,13 @@ namespace BoTech.HttpClientHelper
                 }
             }
         }
-        private StringContent GetJsonHttpContentFromObject(object? objectToSerialize) => new StringContent(JsonConvert.SerializeObject(objectToSerialize), Encoding.UTF8, "application/json");
+        private StringContent GetJsonHttpContentFromObject(object? objectToSerialize) => new StringContent(JsonSerializer.Serialize(objectToSerialize), Encoding.UTF8, "application/json");
         
         private async Task<T?> GetJsonObjectFromHttpResponseMessage<T>(HttpResponseMessage response)
         {
             string jsonData = await response.Content.ReadAsStringAsync();
             if (jsonData.Length > 0)
-                return JsonConvert.DeserializeObject<T>(jsonData);
+                return JsonSerializer.Deserialize<T>(jsonData, JsonSerializerOptions.Web);
             return default(T);
         }
         private HttpClient BuildHttpClient()
