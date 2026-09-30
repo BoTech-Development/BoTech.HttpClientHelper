@@ -82,15 +82,8 @@ namespace BoTech.HttpClientHelper
         /// <returns>The request result with parsed json data object</returns>
         public async Task<RequestResult> HttpGetJsonObject(string url, JsonDtoSelectionOptions options)
         {
-            RequestResult response = await HttpGet(url);
-            if (response.IsSuccess())
-            {
-                string jsonData = await response.ResponseMessage!.Content.ReadAsStringAsync();
-                return RequestResult.SuccessFactory(response.ResponseMessage, await HttpResultToJsonConverter.Convert(response.ResponseMessage, options));
-            }
-            return RequestResult.ErrorFactory(response.ResponseMessage, response.Error);
+            return await GetJsonFromRequestResult(await HttpGet(url), options);
         }
-    
         /// <summary>
         /// Sends a request to _baseUrl + url and returns the string returned by that method.
         /// </summary>
@@ -300,9 +293,12 @@ namespace BoTech.HttpClientHelper
         {
             try
             {
-                if (result.IsSuccess() &&  result.ResponseMessage != null)
-                    return RequestResult.SuccessFactory(result.ResponseMessage, await HttpResultToJsonConverter.Convert(result.ResponseMessage, options));
-                return RequestResult.ErrorFactory(result.ResponseMessage, result.Error);
+                if(result.ResponseMessage is null)
+                    return RequestResult.ErrorFactory(result.ResponseMessage, new Exception("Response message is null"));
+                object? data = await HttpResultToJsonConverter.Convert(result.ResponseMessage, options);
+                if (result.IsSuccess())
+                    return RequestResult.SuccessFactory(result.ResponseMessage, data);
+                return RequestResult.ErrorFactory(result.ResponseMessage, result.Error, data);
             }
             catch (Exception e)
             {

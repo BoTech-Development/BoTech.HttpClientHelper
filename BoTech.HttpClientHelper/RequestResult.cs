@@ -44,6 +44,11 @@ namespace BoTech.HttpClientHelper
             return new RequestResult(false, message, null, exception);
         }
         
+        public static RequestResult ErrorFactory(HttpResponseMessage? message, Exception? exception, object? data)
+        {
+            return new RequestResult(false, message, data, exception);
+        }
+        
         public bool IsSuccess()
         {
             return _success && Error == null && ResponseMessage != null && ResponseMessage.IsSuccessStatusCode;
